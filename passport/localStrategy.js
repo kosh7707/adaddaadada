@@ -10,9 +10,9 @@ module.exports = () => {
         passReqToCallback: false,
     }, async (email, password, done) => {
         try {
-            const [rows] = await db.execute('SELECT * FROM users WHERE email=?', [email]);
+            const [rows] = await db.execute(`select * from accounts where user_email = ?`, [email]);
             if (rows.length > 0) {
-                const result = await bcrypt.compare(password, rows[0].password);
+                const result = await bcrypt.compare(password, rows[0].user_pw);
                 if (result) {
                     done(null, rows[0]);
                 } else {

@@ -3,8 +3,9 @@ const morgan = require("morgan");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const nunjucks = require("nunjucks");
-const path = require("path");
+require("path");
 const passport = require('passport');
+const favicon = require('serve-favicon');
 
 require("dotenv").config();
 require("./passport")();
@@ -43,6 +44,7 @@ app.use("/", indexRouter);
 app.use("/board", boardRouter);
 app.use("/auth", authRouter);
 app.use("/bootstrap", bootstrapRouter);
+app.get(favicon('public/favicon.ico'));
 
 app.use((req, res, next) => {
     const err = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
@@ -50,7 +52,7 @@ app.use((req, res, next) => {
     next(err);
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error(err);
     res.send(err);
 });

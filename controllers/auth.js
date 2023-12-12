@@ -5,12 +5,13 @@ const db = require(process.cwd() + '/models');
 exports.register = async (req, res, next) => {
     const {email, nickname, password} = req.body;
     try {
-        const [rows] = await db.execute('SELECT * FROM users WHERE email=?', [email]);
-        if (rows.length != 0) {
+        const [rows] = await db.execute(`select * from accounts where user_email=?`, [email]);
+        if (rows.length !== 0) {
             return res.redirect('/');
         }
         const hash = await bcrypt.hash(password, 12);
-        await db.execute('INSERT INTO users (email, nickname, password) VALUES (?, ?, ?)', [email, nickname, hash]);
+        await db.execute(`insert into accounts(user_email, user_pw) values (?, ?)`, [email, hash]);
+        await db.execute(`insert into userinfo(account_id, nickname) values ((select account_id from accounts where user_email = ?), ?)`, [email, nickname]);
         return res.redirect('/');
     } catch (err) {
         console.error(err);
