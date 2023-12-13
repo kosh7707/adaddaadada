@@ -1,26 +1,20 @@
 const express = require("express");
-const request = require("request");
-const path = require("path");
+
+const { isLoggedIn } = require("../middlewares");
+const { mainPage, newPost, uploadPost, viewPost, writeComment, likePost } = require("../controllers/post");
+
 const router = express.Router();
 
-require("dotenv").config();
+router.get("/", isLoggedIn, mainPage);
 
-router.get("/", async (req, res, next) => {
-    try {
-        if (req.isAuthenticated()) {
-            const data = {
-                username: req.user.nickname,
-                fruits: ['Apple', 'Banana', 'Orange'],
-            };
-            res.render("body", data);
-        }
-        else {
-            res.redirect("/");
-        }
-    } catch (err) {
-        console.error(err);
-        next(err);
-    }
-});
+router.get("/newpost", isLoggedIn, newPost);
+
+router.post("/newpost", isLoggedIn, uploadPost);
+
+router.get("/:post_id", isLoggedIn, viewPost);
+
+router.post("/:post_id/comment", isLoggedIn, writeComment);
+
+router.post("/:post_id/like", isLoggedIn, likePost);
 
 module.exports = router;

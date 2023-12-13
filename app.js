@@ -3,7 +3,6 @@ const morgan = require("morgan");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const nunjucks = require("nunjucks");
-require("path");
 const passport = require('passport');
 const favicon = require('serve-favicon');
 

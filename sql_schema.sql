@@ -36,7 +36,8 @@ create table posts (
     post_id     int not null AUTO_INCREMENT, 
     title       varchar(255) not null, 
     content     text not null, 
-    author_id   int not null, 
+    author_id   int not null,
+    view_count  int not null default 0,
     created_at  timestamp default current_timestamp, 
     updated_at  timestamp default current_timestamp on update current_timestamp,
     primary key (post_id),
@@ -56,4 +57,11 @@ create table comments (
     foreign key (author_id) references accounts(account_id) on delete cascade
 ) ENGINE=InnoDB default CHARSET=utf8;
 
-
+drop table if exists likes cascade;
+create table likes (
+    post_id int not null,
+    like_id int not null,
+    primary key (post_id, like_id),
+    foreign key (post_id) references posts(post_id) on delete cascade,
+    foreign key (like_id) references accounts(account_id) on delete cascade
+) ENGINE=InnoDB default CHARSET=utf8;

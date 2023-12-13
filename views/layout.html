@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Default Title{% endblock %}</title>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <script src="/bootstrap/js/bootstrap.bundle.js"></script>
 </head>
 <body>
 
-<header>
-    {% include "header.html" %}
-</header>
+<!--header-->
+{% include "header.html" %}
 
+<!--body-->
 <div class="container">
     {% block body %}{% endblock %}
 </div>
 
-<footer>
-    {% include "footer.html" %}
-</footer>
+<!--footer-->
+{% include "footer.html" %}
 
 </body>
 </html>

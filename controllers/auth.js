@@ -20,7 +20,7 @@ exports.register = async (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    passport.authenticate('local', (authErr, user, info) => {
+    passport.authenticate('local', (authErr, user) => {
         if (authErr) {
             console.error(authErr);
             return next(authErr);
@@ -28,14 +28,15 @@ exports.login = (req, res, next) => {
         if (!user) {
             return res.redirect('/');
         }
-        return req.login(user, (loginErr) => {
+        return req.login(user, async (loginErr) => {
             if (loginErr) {
                 console.error(loginErr);
                 return next(loginErr);
             }
+            await db.execute(`update accounts set last_login = current_timestamp where account_id = ?`, [user.account_id]);
             return res.redirect('/board');
         });
-    })(req, res, next);
+    }) (req, res, next);
 };
 
 exports.logout = (req, res) => {
