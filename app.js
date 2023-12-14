@@ -39,10 +39,14 @@ const indexRouter = require("./routes");
 const boardRouter = require("./routes/board");
 const authRouter = require("./routes/auth");
 const bootstrapRouter = require("./routes/bootstrap");
+const profileRouter = require("./routes/profile");
+const characterSearchRouter = require("./routes/characterSearch");
 app.use("/", indexRouter);
 app.use("/board", boardRouter);
 app.use("/auth", authRouter);
 app.use("/bootstrap", bootstrapRouter);
+app.use("/profile", profileRouter);
+app.use("/charactersearch", characterSearchRouter);
 app.get(favicon('public/favicon.ico'));
 
 app.use((req, res, next) => {
