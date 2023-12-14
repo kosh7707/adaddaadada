@@ -5,7 +5,17 @@
 {% block body %}
 
 <div class="container mt-4">
-    <h3>{{ post.title }}</h3>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>{{ post.title }}</h3>
+        </div>
+        {% if user_id == post.author_id %}
+        <div class="col-md-6 text-end">
+            <button id="edit_btn" class="btn btn-primary col-md-2" value="{{ post.post_id }}">수정</button>
+            <button id="remove_btn" class="btn btn-secondary col-md-2" value="{{ post.post_id }}">삭제</button>
+        </div>
+        {% endif %}
+    </div>
     <div class="row border-bottom">
         <div class="col-md-6">
             <p class="text-muted">{{ post.nickname }}  |  {{ post.created_at }}</p>
@@ -33,6 +43,7 @@
                     <th scope="col" style="width: 15%;"></th>
                     <th scope="col" style="width: 70%;"></th>
                     <th scope="col" style="width: 15%;"></th>
+                    <th scope="col" style="width: 5%;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -41,6 +52,10 @@
                 <td class="text-start text-muted">{{ comment.nickname }}</td>
                 <td class="text-start">{{ comment.content }}</td>
                 <td class="text-center text-muted">{{ comment.created_at }}</td>
+                <td class="text-center">
+                    <button id="remove_comment_btn" class="btn btn-danger btn-sm"
+                            style="width: 30px; height: 30px;" value="{{ comment.comment_id }}">X</button>
+                </td>
             </tr>
             {% endfor %}
             </tbody>
@@ -57,5 +72,50 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('#remove_btn').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            const post_id = e.target.value;
+            const confirmDelete = confirm('게시글을 삭제하시겠습니까?');
+
+            if (confirmDelete) {
+                axios.delete(`/board/${post_id}`)
+                    .then(() => {
+                        window.location.href = "/";
+                    })
+                    .catch(error => {
+                        alert("삭제 실패");
+                        console.error(error);
+                    });
+            }
+        });
+    });
+
+    document.querySelectorAll('#edit_btn').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            const post_id = e.target.value;
+            window.location.href = `/board/${post_id}/edit`;
+        });
+    });
+
+    document.querySelectorAll('#remove_comment_btn').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            const comment_id = e.target.value;
+            const confirmDelete = confirm('댓글을 삭제하시겠습니까?');
+
+            if (confirmDelete) {
+                axios.delete(`/board/comment/${comment_id}`)
+                    .then(() => {
+                        window.location.href = "/board/{{ post.post_id }}";
+                    })
+                    .catch(error => {
+                        alert("삭제 실패");
+                        console.error(error);
+                    });
+            }
+        });
+    })
+</script>
 
 {% endblock %}

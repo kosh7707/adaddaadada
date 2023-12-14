@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}Create Post{% endblock %}
+
+{% block body %}
+<form action="/board/{{ post.post_id }}/edit" method="post">
+    <div class="mb-3">
+        <label for="title" class="form-label"></label>
+        <input type="text" class="form-control" id="title" name="title" placeholder="제목을 입력해 주세요." value="{{ post.title }}"required>
+    </div>
+
+    <div class="mb-3">
+        <label for="content" class="form-label"></label>
+        <textarea class="form-control" id="content" name="content" rows="10" placeholder="내용을 입력해 주세요." required>{{ post.content }}</textarea>
+    </div>
+
+    <div class="mb-3">
+        <div class="col text-end">
+            <button type="submit" class="btn btn-primary col-md-1">등록</button>
+            <button type="button" class="btn btn-secondary col-md-1" onclick="() => { window.history.back(); }">취소</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
