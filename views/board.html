@@ -1,15 +1,23 @@
 {% extends "layout.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}자유게시판{% endblock %}
 
 {% block body %}
 
 <style>
-    tbody tr:hover {
+    #title:hover {
         cursor: pointer;
+        background-color: lightgray;
+    }
+    #author:hover {
+        cursor: pointer;
+        background-color: lightgray;
     }
 </style>
 
+<div class="container">
+    <h1 class="pb-2">자유게시판</h1>
+</div>
 <table class="table caption-top table-bordered table-hover">
     <thead class="table-dark">
         <tr>
@@ -23,14 +31,14 @@
     </thead>
     <tbody>
         {% for post in posts %}
-        <tr data-post-id="{{ post.post_id }}">
+        <tr>
             <th scope="col" class="text-center">{{ post.post_id }}</th>
-            <td class="text-start">{{ post.title }}
+            <td id="title" class="text-start" data-post-id="{{ post.post_id }}">{{ post.title }}
                 {% if post.comment_count != 0 %}
                 <span class="text-muted">[{{ post.comment_count }}]</span>
                 {% endif %}
             </td>
-            <td class="text-center">{{ post.nickname }}</td>
+            <td id="author" class="text-center" data-author-id="{{ post.author_id }}">{{ post.nickname }}</td>
             <td class="text-center">{{ post.created_at }}</td>
             <td class="text-center">{{ post.view_count }}</td>
             <td class="text-center">{{ post.like_count }}</td>
@@ -40,13 +48,17 @@
 </table>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            row.addEventListener('click', function() {
-                const postId = row.dataset.postId;
-                window.location.href = `/board/${postId}`;
-            });
+    document.querySelectorAll('#title').forEach(row => {
+        row.addEventListener('click', function() {
+            const postId = row.dataset.postId;
+            window.location.href = `/board/${postId}`;
+        });
+    });
+
+    document.querySelectorAll('#author').forEach(row => {
+        row.addEventListener('click', function() {
+            const authorId = row.dataset.authorId;
+            window.location.href = `/profile/${authorId}`;
         });
     });
 </script>

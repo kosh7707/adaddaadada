@@ -1,11 +1,66 @@
 {% extends "layout.html" %}
 
-{% block title %}Create Post{% endblock %}
+{% block title %}캐릭터검색{% endblock %}
 
 {% block body %}
 
 <div class="container">
-    캐릭터 서치 구현 필요. {{ hello }}
+    <h1 class="pb-2">캐릭터검색</h1>
+    <form action="/charactersearch/search" method="post" class="my-4">
+        <div class="mb-3 row">
+            <label for="character_name" class="form-label col-md-2"></label>
+            <div class="col-md-8">
+                <input type="text" class="form-control" id="character_name" name="character_name" placeholder="캐릭터 닉네임" required>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">검색</button>
+            </div>
+        </div>
+    </form>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for character in characters %}
+        <div class="col">
+            <div class="card" data-characters='{{ characters | dump | safe }}' data-main-character='{{ character | dump | safe }}'>
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2 fw-bold">{{ character.CharacterName }}</h5>
+                    <p class="card-text">서버: {{ character.ServerName }}</p>
+                    <p class="card-text">직업: {{ character.CharacterClassName }}</p>
+                    <p class="card-text">템렙: {{ character.ItemAvgLevel }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+
+<style>
+    .card:hover {
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transform: scale(1.02);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            const mainCharacter = JSON.parse(e.target.closest('.card').dataset.mainCharacter);
+            const characters = JSON.parse(e.target.closest('.card').dataset.characters);
+            const confirmDelete = confirm('대표캐릭터로 지정하시겠습니까?');
+
+            if (confirmDelete) {
+                axios.post("/charactersearch/registermaincharacter", { mainCharacter, characters })
+                    .then(() => {
+                        window.location.href = "/profile";
+                    })
+                    .catch(error => {
+                        alert("등록 실패");
+                        console.error(error);
+                    })
+            }
+        });
+    });
+</script>
 
 {% endblock %}

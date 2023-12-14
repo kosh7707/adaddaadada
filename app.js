@@ -5,6 +5,7 @@ const session = require('express-session');
 const nunjucks = require("nunjucks");
 const passport = require('passport');
 const favicon = require('serve-favicon');
+const multer = require('multer');
 
 require("dotenv").config();
 require("./passport")();

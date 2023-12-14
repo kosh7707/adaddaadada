@@ -14,9 +14,11 @@ create table accounts (
 drop table if exists characters cascade;
 create table characters (
     character_id    int not null AUTO_INCREMENT, 
-    account_id      int not null, 
-    item_level      float not null, 
-    character_name  varchar(20) not null, 
+    account_id      int not null,
+    server_name     varchar(20) not null,
+    class_name      varchar(20) not null,
+    character_name  varchar(20) not null unique,
+    item_level      float not null,
     primary key (character_id),
     foreign key (account_id) references accounts(account_id) on delete cascade
 ) ENGINE=InnoDB default CHARSET=utf8;

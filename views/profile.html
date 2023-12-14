@@ -1,11 +1,160 @@
 {% extends "layout.html" %}
 
-{% block title %}Create Post{% endblock %}
+{% block title %}프로필{% endblock %}
 
 {% block body %}
 
 <div class="container">
-    프로필 구현 필요. {{ hello }}
+    <h1 class="pb-2">프로필</h1>
+
+    {% if req_user_id == profile_id %}
+    <form id="profileForm" class="form-inline" action="/profile/edit" method="post" enctype="multipart/form-data">
+        <div class="row g-2 align-items-center">
+            <div class="col-6">
+                <div class="row g-2 align-items-center justify-content-center pb-2">
+                    <div class="col-auto">
+                        <label for="nickname" class="col-form-label text-center" style="width: 100px">닉네임</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" id="nickname" name="nickname" class="form-control" style="width: 300px" value="{{ userinfo.nickname }}">
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center justify-content-center">
+                    <div class="col-auto">
+                        <label for="maincharacter" class="col-form-label text-center" style="width: 100px;">대표캐릭터</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" id="maincharacter" name="maincharacter" class="form-control" style="width: 300px" value="{{ userinfo.main_character_name }}" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="col-auto rounded-circle overflow-hidden " style="width: 150px; height: 150px; background-color: #e9ecef;">
+                    <input type="file" id="profileImageInput" name="profileImage" style="display: none;" accept="image/*">
+                    <img id="previewImage" src="uploads/alt.png" alt="uploads/alt.png" class="img-fluid h-150" style="object-fit: cover;" onclick="openProfileImageInput()">
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="col text-end">
+                <button type="submit" class="btn btn-primary">수정</button>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="row g-2 align-items-center">
+        <div class="col-6">
+            <div class="row g-2 align-items-center justify-content-center pb-2">
+                <div class="col-auto">
+                    <label for="nickname" class="col-form-label text-center" style="width: 100px">닉네임</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="nickname" name="nickname" class="form-control" style="width: 300px" value="{{ userinfo.nickname }}" disabled>
+                </div>
+            </div>
+            <div class="row g-2 align-items-center justify-content-center">
+                <div class="col-auto">
+                    <label for="maincharacter" class="col-form-label text-center" style="width: 100px;">대표캐릭터</label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" id="maincharacter" name="maincharacter" class="form-control" style="width: 300px" value="{{ userinfo.main_character_name }}" disabled>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="col-auto rounded-circle overflow-hidden " style="width: 150px; height: 150px; background-color: #e9ecef;">
+                <img id="previewImage" src="uploads/alt.png" alt="uploads/alt.png" class="img-fluid h-150" style="object-fit: cover;">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <h1 class="border-top pt-2 pb-2">보유 캐릭터</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for character in characters %}
+        <div class="col">
+            <div class="card" data-character-id='{{ character.character_id }}'>
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2 fw-bold">{{ character.character_name }}</h5>
+                    <p class="card-text">서버: {{ character.server_name }}</p>
+                    <p class="card-text">직업: {{ character.class_name }}</p>
+                    <p class="card-text">템렙: {{ character.item_level }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+
+<style>
+    .card:hover {
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transform: scale(1.02);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+</style>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileId = {{ profile_id }};
+        axios.get(`/uploads/${profileId}_profile.png`)
+            .then(() => {
+                document.getElementById('previewImage').src = `/uploads/${profileId}_profile.png`;
+            })
+            .catch(() => {
+                document.getElementById('previewImage').src = `/uploads/alt.png`;
+            });
+    });
+</script>
+
+{% if req_user_id == profile_id %}
+<style>
+    #previewImage:hover {
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    function openProfileImageInput() {
+        document.getElementById('profileImageInput').click();
+    }
+    document.getElementById('profileImageInput').addEventListener('change', handleProfileImageUpload);
+
+    function handleProfileImageUpload(event) {
+        const fileInput = event.target;
+        const file = fileInput.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const previewImage = document.getElementById('previewImage');
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            const character_id = e.target.closest('.card').dataset.characterId;
+            const confirmDelete = confirm('대표캐릭터로 지정하시겠습니까?');
+
+            if (confirmDelete) {
+                axios.post("/profile/changemaincharacter", { character_id })
+                    .then(() => {
+                        window.location.href = "/profile";
+                    })
+                    .catch(error => {
+                        alert("등록 실패");
+                        console.error(error);
+                    });
+            }
+        });
+    });
+</script>
+{% endif %}
 
 {% endblock %}

@@ -2,7 +2,7 @@ const db = require('../models');
 
 exports.mainPage = async (req, res, next) => {
     try {
-        const [posts] = await db.execute(`select p.post_id, p.title, p.content, u.nickname, p.view_count
+        const [posts] = await db.execute(`select p.post_id, p.title, p.content, u.nickname, p.view_count, p.author_id
                                             , DATE_FORMAT(p.created_at, '%Y-%m-%d') as created_at
                                             , (select count(*) from likes where post_id = p.post_id) as like_count
                                             , (select count(*) from comments where post_id = p.post_id) as comment_count
